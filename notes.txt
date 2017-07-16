@@ -1,0 +1,104 @@
+mongo "mongodb://todo-cluster-shard-00-00-uo9wx.mongodb.net:27017,todo-cluster-shard-00-01-uo9wx.mongodb.net:27017,todo-cluster-shard-00-02-uo9wx.mongodb.net:27017/test?replicaSet=todo-cluster-shard-0" --authenticationDatabase admin --ssl --username aayush123 --password todoapppass
+
+When logging in, validate creds and send clientToken as response.
+clientToken is salted hash of mongodb _id.
+With every subsequent api request, client sends the clientToken and username.
+validate salted hash of mongodb _id against received clientToken.
+If authentication succeeds, process request. else, refuse request.
+
+usecases:
+- add tasks to project
+- mark task as completed
+- delete task
+- add project
+- delete project
+- delete all completed tasks
+- fetch all data
+- sync all data
+
+add project query:
+db.todoList.update(
+  {
+    username:"TestID"
+  },
+  {
+    $push: {
+      projects: {projectName: "TestProj2", tasks: []}
+    }
+  }
+);
+
+add task query:
+db.todoList.update(
+  {
+    username: "TEstID",
+    projects: {
+      $elemMatch: {
+        projectName: "TestProj"
+      }
+    }
+  },
+  {
+    $push: {
+      "projects.$.tasks": {
+        taskName: "TestTask2",
+        completed: false
+      }
+    }
+  }
+);
+
+delete project query:
+db.todoList.update(
+  {
+    username:"TestID"
+  },
+  {
+    $pull: {
+      projects: {projectName: "TestProj2"}
+    }
+  }
+);
+
+delete task query:
+db.todoList.update(
+  {
+    username: "TEstID",
+    projects: {
+      $elemMatch: {
+        projectName: "TestProj2"
+      }
+    }
+  },
+  {
+    $pull: {
+      "projects.$.tasks": {
+        taskName: "TestTask"
+      }
+    }
+  }
+);
+
+update task completion status of task:
+db.todoList.update(
+  {
+    username: "TEstID",
+    projects: {
+      $elemMatch: {
+        projectName: "TestProj",
+        tasks: {
+          $elemMatch: {
+            taskName: "TestTask"
+          }
+        }
+      }
+    }
+  },
+  {
+    $set: {
+      "projects.$.tasks.$": {
+        completed: true
+      }
+    }
+  }
+)
