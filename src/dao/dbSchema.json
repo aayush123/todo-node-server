@@ -5,38 +5,6 @@
   "password": "encryptedHash"
 }
 
-
-
-/*OPTION1*/
-/*===========================================================================*/
-/*projectList*/
-{
-  "_id": "<ObjectId>",
-  "username": "username from users",
-  "projects": [
-    {
-      "projectId":"SomeId",
-      "projectName":"String",
-    }
-  ]
-}
-
-/*TaskList*/
-{
-  "_id": "<ObjectId>",
-  "username": "username from users",
-  "projectName": "projectName from projectList",
-  "tasks": [
-    {
-      "taskTitle": "String",
-      "completed": "Boolean"
-    }
-  ]
-}
-/*===========================================================================*/
-
-/*OPTION2*/
-/*===========================================================================*/
 /*todoList*/
 {
   "_id": "<ObjectId>",
@@ -55,4 +23,3 @@
     }
   ]
 }
-/*===========================================================================*/

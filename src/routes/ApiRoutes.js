@@ -4,6 +4,7 @@ const bodyParser = require('body-parser');
 const dao = require('../dao/dao');
 const logger = require('../../Logs/logger');
 const helpers = require('../utilities/Helpers');
+const dbOperations = require('../dao/DbOperations');
 
 let router = Express.Router();
 router.use(bodyParser.json());
@@ -17,12 +18,12 @@ router.post('/signup', function (req, res) {
     if (userObj) {
       res.send({userExists: true});
     } else {
-      dao.insert({username, password}, 'users')
+      dbOperations.createUser({username, password})
       .then((results) => {
         logger.debug(results);
         res.send({userCreated: true});
       })
-      .then(dao.insert({username, projects: []}, 'todoList'))
+      .then(dbOperations.createUserTodoList(username))
       .catch((err) => {
         logger.error(err);
         res.status(500);
@@ -69,7 +70,22 @@ router.post('/newProject', function (req, res) {
   let projectName = req.body.projectName;
   let username = req.body.username;
   helpers.validateRequest(username, clientToken)
-  .then()
+  .then(dbOperations.createNewProject(username, projectName))
+  .then(() => {
+    logger.debug('Project ' + projectName + ' created successfully');
+    res.send({
+      projectCreated: true
+    });
+  })
+  .catch((err) => {
+    if (err.projectExists) {
+      logger.debug('Project already exists for the user');
+      res.send(err);
+    } else {
+      logger.error('Error while creating project');
+      res.send({errorMsg: 'Error while creating project'});
+    }
+  });
 });
 
 module.exports = router;

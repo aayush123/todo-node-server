@@ -19,11 +19,11 @@ usecases:
 add project query:
 db.todoList.update(
   {
-    username:"TestID"
+    username:"testID"
   },
   {
     $push: {
-      projects: {projectName: "TestProj2", tasks: []}
+      projects: {projectName: "TestProj2"}
     }
   }
 );
@@ -31,19 +31,11 @@ db.todoList.update(
 add task query:
 db.todoList.update(
   {
-    username: "TEstID",
-    projects: {
-      $elemMatch: {
-        projectName: "TestProj"
-      }
-    }
+    username:"testID"
   },
   {
     $push: {
-      "projects.$.tasks": {
-        taskName: "TestTask2",
-        completed: false
-      }
+      tasks: {projectName: "TestProj2", taskName: "TestTask", completed: false}
     }
   }
 );
@@ -51,11 +43,14 @@ db.todoList.update(
 delete project query:
 db.todoList.update(
   {
-    username:"TestID"
+    username:"testID"
   },
   {
     $pull: {
-      projects: {projectName: "TestProj2"}
+      projects: {projectName: "TestProj2"},
+      tasks: {
+        projectName: "TestProj2"
+      }
     }
   }
 );
@@ -63,16 +58,11 @@ db.todoList.update(
 delete task query:
 db.todoList.update(
   {
-    username: "TEstID",
-    projects: {
-      $elemMatch: {
-        projectName: "TestProj2"
-      }
-    }
+    username:"testID"
   },
   {
     $pull: {
-      "projects.$.tasks": {
+      tasks: {
         taskName: "TestTask"
       }
     }
@@ -82,23 +72,12 @@ db.todoList.update(
 update task completion status of task:
 db.todoList.update(
   {
-    username: "TEstID",
-    projects: {
-      $elemMatch: {
-        projectName: "TestProj",
-        tasks: {
-          $elemMatch: {
-            taskName: "TestTask"
-          }
-        }
-      }
-    }
+    username:"testID",
+    "tasks.taskName": "TestTask"
   },
   {
     $set: {
-      "projects.$.tasks.$": {
-        completed: true
-      }
+      "tasks.$.completed": true
     }
   }
-)
+);

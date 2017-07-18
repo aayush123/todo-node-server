@@ -41,6 +41,17 @@ function findOne(parameters, collection) {
   });
 }
 
+function update(filterObject, operationObject, collection) {
+  return new Promise(function(resolve, reject) {
+    databaseObj.collection(collection).update(filterObject, operationObject)
+    .then(resolve)
+    .catch((err) => {
+      logger.error(err);
+      reject('Error while updating in database');
+    });
+  });
+}
+
 module.exports = {
   connect,
   insert,
